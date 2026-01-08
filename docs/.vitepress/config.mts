@@ -16,8 +16,12 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: '教程',
         items: [
+          {
+            text: '前言',
+            collapsed: false,
+            link: '/tutorials/'
+          },
           {
             text: '第一章 核心概念（定义与标准）',
             collapsed: false,
