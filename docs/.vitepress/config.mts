@@ -67,6 +67,17 @@ export default defineConfig({
             items: [
               { text: 'LLM 时代的生成式推荐复现', link: '/tutorials/05_Frontiers/01_Generative_Rec_LLM' }
             ]
+          },
+          {
+            text: '第六章 专题深潜（选修）',
+            collapsed: true,
+            items: [
+              { text: 'A/B 测试的工业级玩法', link: '/tutorials/06_Magic_Lab/01_Advanced_AB_Test' },
+              { text: '冷启动', link: '/tutorials/06_Magic_Lab/02_Cold_Start_Mastery' },
+              { text: '重排与多样性', link: '/tutorials/06_Magic_Lab/03_Reranking_Strategies' },
+              { text: '实时特征工程的细节', link: '/tutorials/06_Magic_Lab/04_Realtime_Features' },
+              { text: '预估分数校准', link: '/tutorials/06_Magic_Lab/05_Model_Calibration' }
+            ]
           }
         ]
       }
