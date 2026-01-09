@@ -7,6 +7,9 @@ export default defineConfig({
   lang: 'zh-CN',
   base: '/magic-recsys/',
   lastUpdated: true,
+  head: [
+    ['script', { src: 'https://hypothes.is/embed.js', async: 'true' }],
+  ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -92,6 +95,13 @@ export default defineConfig({
     ],
     search: {
       provider: 'local'
+    },
+    notFound: {
+      title: '推荐系统崩溃了！',
+      quote: '糟糕！我们的召回模型出现了严重的"精准率"问题——你要找的页面不在索引库里。别慌！让我们回到主页，用冷启动策略重新开始探索吧 🎯',
+      linkLabel: '执行冷启动策略',
+      linkText: '返回主页',
+      code: '找不着你要找的页面咯'
     }
   },
   markdown: {
