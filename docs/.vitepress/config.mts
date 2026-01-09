@@ -91,7 +91,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/1985312383/magic-recsys' }
     ],
     search: {
       provider: 'local'
