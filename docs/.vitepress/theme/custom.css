@@ -396,3 +396,37 @@ td {
   width: 10%;
   /* 强制均匀分配宽度 */
 }
+
+/* 当 body 加上 sidebar-collapsed 类时生效 */
+
+@media (min-width: 960px) {
+  /* 1. 隐藏侧边栏 */
+  .sidebar-collapsed .VPSidebar {
+    width: 0 !important;
+    transform: translateX(-100%); /* 移出屏幕 */
+    padding: 0 !important;
+    overflow: hidden;
+    transition: all 0.3s ease; /* 添加过渡动画 */
+    border-right: none !important;
+  }
+
+  /* 2. 让内容区域填满左侧空白 */
+  .sidebar-collapsed .VPContent {
+    padding-left: 0 !important; /* 移除原本为侧边栏留的左边距 */
+    transition: padding-left 0.3s ease;
+  }
+
+  /* 3. 调整页脚位置（如果有） */
+  .sidebar-collapsed .VPFooter {
+    padding-left: 0 !important;
+    transition: padding-left 0.3s ease;
+  }
+
+  /* 4. 修复顶部导航栏宽度（VitePress 默认布局可能会计算这个） */
+  /* 通常不需要特别修改，除非你的导航栏布局很特殊 */
+}
+
+/* 给正常状态也加个过渡，让展开收起更丝滑 */
+.VPSidebar, .VPContent, .VPFooter {
+  transition: all 0.3s ease;
+}
