@@ -117,7 +117,7 @@ $$ \text{eCPM} = \text{CTR} \times \text{CVR} \times \text{Target\_CPA} \times 1
 3.  **精排（Ranking）**：复杂深度模型（DeepFM/DIN 等）打分。
 4.  **重排（Re-ranking）**：加入业务规则（去重、打散、强插）。
 
-::: tip
+::: tip 广告系统的另一点不同
 广告系统由于候选集（在线广告库）通常比全量商品库小一个数量级（百万级 vs 十亿级），有时会简化甚至省略粗排环节，直接让精排模型处理更多候选。
 :::
 
