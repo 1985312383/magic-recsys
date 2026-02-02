@@ -10,6 +10,13 @@ description: 从 Netflix Prize 到 FunkSVD，用 Numpy 实现矩阵分解，理�
 
 矩阵分解（Matrix Factorization, MF）提供了一种优雅的解决方案：不再直接比较用户或物品，而是**学习每个用户和物品的低维隐向量表示**，用向量内积来预测用户对物品的偏好。这种方法不仅缓解了稀疏性问题，还为后来的 Embedding 技术奠定了思想基础。
 
+:::info 代码说明
+本节代码位于 `src/ch02/03_matrix_factorization.py`。运行前请确保：
+1. 已下载MIND数据集到 `src/dataset/train/MINDsmall_train/`
+2. 已安装依赖：`pip install numpy pandas`
+3. 在 `src/ch02/` 目录下运行：`python 03_matrix_factorization.py`
+:::
+
 ## 矩阵分解的历史渊源
 
 矩阵分解在推荐系统中的崛起，离不开一场改变整个领域的竞赛——**Netflix Prize**。
