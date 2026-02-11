@@ -1,5 +1,5 @@
 """
-矩阵分解算法实现（FunkSVD, BiasSVD）
+矩阵分解算法实现（FunkSVD）
 """
 
 import numpy as np
@@ -174,10 +174,10 @@ if __name__ == "__main__":
     print(f"FunkSVD 推荐: {recommendations}")
     
     # 评估
-    print("\n【4. 评估】")
+    print("\n【4. 评估 FunkSVD】")
     hr = evaluate_mf(model, ratings_df, test_users=500, k_rec=10)
     print(f"FunkSVD HR@10: {hr:.4f}")
-    
+
     print("\n" + "=" * 60)
     print("完成！")
     print("=" * 60)

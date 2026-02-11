@@ -153,8 +153,8 @@ def compute_category_ctr(behaviors_df, news_df, category2idx):
     return category_ctr, news_category
 
 
-def extract_features_simple(behaviors_df, news_df, news_ctr, user_stats, user_ctr, 
-                            news_category, max_samples=50000):
+def extract_features_simple(behaviors_df, news_df, news_ctr, user_stats, user_ctr,
+                            news_category, category_ctr, max_samples=50000):
     """
     提取特征 - 使用6个核心统计特征
     """
@@ -273,7 +273,7 @@ def main():
     print("\n[4] 提取特征（6个核心特征）...")
     features, labels = extract_features_simple(
         behaviors, news, news_ctr, user_stats, user_ctr,
-        news_category, max_samples=50000
+        news_category, category_ctr, max_samples=50000
     )
     print(f"样本数: {len(features):,}")
     print(f"正样本数: {sum(labels):,}")
@@ -340,6 +340,21 @@ def main():
     for name, weight in importance:
         print(f"  {name}: {weight:.4f}")
     
+    print("\n[10] 消融实验...")
+    print(f"基线 AUC（全部特征）: {auc:.4f}")
+    print("\n去掉单个特征后的 AUC 变化:")
+
+    for i, name in enumerate(feature_names):
+        X_train_drop = np.delete(X_train, i, axis=1)
+        X_test_drop = np.delete(X_test, i, axis=1)
+
+        drop_model = LogisticRegression(learning_rate=1.0, n_epochs=200, reg_lambda=0.01)
+        drop_model.fit(X_train_drop, y_train, verbose=False)
+        drop_auc = roc_auc_score(y_test, drop_model.predict_proba(X_test_drop))
+
+        delta = drop_auc - auc
+        print(f"  去掉 {name:20s} → AUC: {drop_auc:.4f} (Δ = {delta:+.4f})")
+
     print("\n" + "=" * 60)
     print("完成!")
     print("=" * 60)

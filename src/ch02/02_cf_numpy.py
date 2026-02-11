@@ -283,7 +283,7 @@ def evaluate_cf(recommend_func, interaction_matrix, similarity_matrix,
     }
 
 print("\n评估 UserCF...")
-user_cf_metrics = evaluate_cf(user_cf_recommend, interaction_matrix, user_similarity, 
+user_cf_metrics = evaluate_cf(user_cf_recommend, interaction_matrix, user_similarity,
                                test_users=500, k_rec=10, is_user_cf=True)
 for k, v in user_cf_metrics.items():
     if isinstance(v, float):

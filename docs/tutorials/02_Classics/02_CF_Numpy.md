@@ -155,7 +155,13 @@ $$
 
 其中 $I_u$ 是用户 $u$ 交互过的物品集合。
 
-**改进的余弦相似度（IUF）**：对热门物品做惩罚。如果两个用户都买过可口可乐，这不能说明他们品味相似——因为太多人都买可口可乐了。IUF（Inverse User Frequency）借鉴了 TF-IDF 的思想，对热门物品降权。
+**改进的余弦相似度（IUF）**：对热门物品做惩罚。如果两个用户都买过可口可乐，这不能说明他们品味相似——因为太多人都买可口可乐了。IUF（Inverse User Frequency）借鉴了 TF-IDF 的思想，对热门物品降权：
+
+$$
+\text{sim}_{IUF}(u, v) = \frac{\sum_{i \in I_u \cap I_v} \frac{1}{\log(1 + |U_i|)}}{\sqrt{|I_u|} \cdot \sqrt{|I_v|}}
+$$
+
+其中 $|U_i|$ 是与物品 $i$ 交互过的用户数。物品越热门，$|U_i|$ 越大，$\frac{1}{\log(1+|U_i|)}$ 越小，对相似度的贡献就越低。这样，两个用户共同点击了一篇冷门深度报道，比共同点击了一篇全民热点新闻，更能说明他们兴趣相似。
 
 ## 数据准备：构建交互矩阵
 
@@ -431,6 +437,12 @@ ItemCF 推荐结果:
 
 我们使用 **留一法（Leave-One-Out）** 进行评估：对每个用户，随机隐藏一个正样本作为测试，用剩余数据做推荐，看能否命中这个隐藏的物品。
 
+::: warning 评估简化说明
+下面的评估代码存在一个有意识的简化：相似度矩阵是基于包含测试物品的完整数据预先计算的，评估时只临时移除了交互矩阵中的测试项，但没有重新计算相似度。这构成了轻微的数据泄露——测试物品的信息通过相似度矩阵间接"泄露"给了推荐过程。
+
+严格做法应该在移除测试物品后重新计算相似度矩阵，但这会让评估速度慢几个数量级。在教程场景下，这种简化对结果的影响很小（因为单个物品对整体相似度矩阵的贡献微乎其微），但在正式的论文实验中，必须避免这种泄露。
+:::
+
 ```python
 def evaluate_cf(recommend_func, interaction_matrix, similarity_matrix, 
                 test_users=500, k_rec=10, is_user_cf=True):
@@ -481,12 +493,12 @@ print(f"  HR@10: {hr_item:.4f}")
 
 ```
 评估 UserCF...
-  HR@10: 0.4268
+  HR@10: 0.4126
 评估 ItemCF...
-  HR@10: 0.1443
+  HR@10: 0.1321
 ```
 
-在 MIND 数据集上，UserCF 的 HR@10 达到了 **42.68%**，明显优于 ItemCF 的 **14.43%**。这验证了我们之前的分析：在新闻推荐场景中，用户的兴趣模式比新闻之间的关联更稳定，因此 UserCF 效果更好。
+在 MIND 数据集上，UserCF 的 HR@10 达到了 **41.26%**，明显优于 ItemCF 的 **13.21%**。这验证了我们之前的分析：在新闻推荐场景中，用户的兴趣模式比新闻之间的关联更稳定，因此 UserCF 效果更好。
 
 ## 使用 Surprise 框架
 
@@ -497,7 +509,12 @@ from surprise import Dataset, Reader, KNNBasic
 from surprise.model_selection import train_test_split
 from surprise import accuracy
 
-# 准备数据（转换为 Surprise 格式）
+# 准备数据：将之前构建的 user_items 字典转换为 Surprise 格式
+ratings_data = []
+for user, items in user_items.items():
+    for item in items:
+        ratings_data.append((user, item, 1.0))  # 隐式反馈统一为 1.0
+
 ratings_df = pd.DataFrame(ratings_data, columns=["user_id", "item_id", "rating"])
 reader = Reader(rating_scale=(0, 1))
 data = Dataset.load_from_df(ratings_df, reader)
@@ -525,6 +542,14 @@ print(f"ItemCF RMSE: {accuracy.rmse(predictions, verbose=False):.4f}")
 ```
 
 Surprise 的优势在于：接口简洁、内置交叉验证、支持多种相似度计算方式（cosine、pearson、MSD 等）、易于调参。如果你只是想快速实验，Surprise 是很好的选择；如果需要深度定制或工业级部署，则需要自己实现或使用更重的框架。
+
+::: danger 工程实践中的常见陷阱
+
+**陷阱一：相似度矩阵的内存爆炸**。用户相似度矩阵的大小是 $n_{users}^2$，物品相似度矩阵是 $n_{items}^2$。当用户或物品数达到百万级时，完整的相似度矩阵根本无法放入内存（100 万用户的相似度矩阵需要约 4TB 内存）。工业界的做法是：只计算和存储 Top-K 相似邻居（稀疏存储），或者使用 LSH（局部敏感哈希）近似计算。
+
+**陷阱二：离线评估与线上效果的巨大鸿沟**。本节的留一法评估是在静态数据上做的，但线上推荐是动态的——用户的行为会随时间变化，新物品不断涌入。一个常见的错误是：离线 HR@10 很高，上线后效果却很差。原因通常是离线评估没有考虑时间因素（用"未来数据"预测"过去的行为"），或者相似度矩阵更新不及时。
+
+:::
 
 :::tip 协同过滤的局限性
 
